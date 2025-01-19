@@ -39,7 +39,7 @@ body {
     overflow-y: auto;
     padding: 10px;
     background-color: #fff;
-    margin-bottom: 60px; /* 为底部工具栏留出空间 */
+    margin-bottom: 120px; /* 为音频可视化器和输入框留出空间 */
 }
 
 .input-container {
@@ -119,6 +119,16 @@ body {
     
     .input-container {
         padding: 8px;
+    }
+    
+    .audio-visualizers {
+        padding: 5px 10px;
+        bottom: 56px;
+    }
+    
+    .visualizer-container label {
+        font-size: 11px;
+        min-width: 70px;
     }
 }
 
@@ -494,29 +504,35 @@ body {
 }
 
 .audio-visualizers {
+    position: fixed;
+    bottom: 60px; /* 在输入框上方 */
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 10px 0;
+    gap: 5px;
+    padding: 10px;
+    background-color: #fff;
 }
 
 .visualizer-container {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    align-items: center;
+    gap: 10px;
 }
 
 .visualizer-container label {
-    font-size: 0.8em;
+    font-size: 12px;
     color: #666;
+    min-width: 80px;
 }
 
 #input-audio-visualizer,
 #audio-visualizer {
-    width: 100%;
-    height: 20px;
-    background-color: #eee;
-    border-radius: 4px;
+    flex: 1;
+    height: 16px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
     overflow: hidden;
 }
 
