@@ -1,13 +1,12 @@
-# Gemini 2.0 PlayGround 
-# Gemini 2.0 游乐场
+# Gemini 2.0 
 
-# [English Version](README_EN.MD)
+# Mosaict
 
-### 作者：技术爬爬虾
-B站，YouTube，抖音，公众号 全网同名。转载请注明作者。
+### 作者：梦渊
+
 
 ## 项目简介
-#### Demo: [https://play.210718.xyz](https://play.210718.xyz)
+#### Demo: [https://mosaict.deno.dev/](https://mosaict.deno.dev/)
 只需准备一个Gemini API Key，10秒即可部署一个Gemini多模态对话的网站。
 不限地区/网络环境，打开即用，<b>适配了手机端</b>。
 使用Deno/Cloudflare Worker无服务器免费部署。
@@ -126,6 +125,13 @@ curl --location 'https://your.domain.com/v1/chat/completions' \
 
 
 ## 致谢/引用：
+
+技术爬爬虾： 
+```
+Author: PublicAffairs
+Project: https://github.com/tech-shrimp/gemini-playground
+MIT License : https://github.com/tech-shrimp/gemini-playground/blob/main/LICENSE
+```
 
 网站UI： 
 ```
