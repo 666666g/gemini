@@ -33,9 +33,10 @@ const fpsInput = document.getElementById('fps-input');
 const configToggle = document.getElementById('config-toggle');
 const configContainer = document.getElementById('config-container');
 const systemInstructionInput = document.getElementById('system-instruction');
-systemInstructionInput.value = CONFIG.SYSTEM_INSTRUCTION.TEXT;
 const applyConfigButton = document.getElementById('apply-config');
 const responseTypeSelect = document.getElementById('response-type-select');
+const settingsButton = document.getElementById('settings-button');
+const settingsPanel = document.getElementById('settings-panel');
 
 // Load saved values from localStorage
 const savedApiKey = localStorage.getItem('gemini_api_key');
@@ -556,4 +557,32 @@ function stopScreenSharing() {
 
 screenButton.addEventListener('click', handleScreenShare);
 screenButton.disabled = true;
+
+// 设置面板显示/隐藏
+settingsButton.addEventListener('click', () => {
+    settingsPanel.classList.toggle('visible');
+});
+
+// 输入框内容变化时显示/隐藏发送按钮
+messageInput.addEventListener('input', () => {
+    sendButton.classList.toggle('hidden', !messageInput.value.trim());
+});
+
+// 发送消息
+sendButton.addEventListener('click', () => {
+    const message = messageInput.value.trim();
+    if (message) {
+        sendMessage(message);
+        messageInput.value = '';
+        sendButton.classList.add('hidden');
+    }
+});
+
+// Enter键发送消息
+messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendButton.click();
+    }
+});
   
