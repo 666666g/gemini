@@ -11,10 +11,8 @@ import { ScreenRecorder } from './video/screen-recorder.js';
  * Initializes and manages the UI, audio, video, and WebSocket interactions.
  */
 
-// 在文件开头添加调试日志
-console.log('Initializing elements...');
-
 // DOM Elements
+const logsContainer = document.getElementById('logs-container');
 const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
 const micButton = document.getElementById('mic-button');
@@ -32,21 +30,12 @@ const inputAudioVisualizer = document.getElementById('input-audio-visualizer');
 const apiKeyInput = document.getElementById('api-key');
 const voiceSelect = document.getElementById('voice-select');
 const fpsInput = document.getElementById('fps-input');
+const configToggle = document.getElementById('config-toggle');
+const configContainer = document.getElementById('config-container');
 const systemInstructionInput = document.getElementById('system-instruction');
-const settingsButton = document.getElementById('settings-button');
-const settingsPanel = document.getElementById('settings-panel');
-
-// 添加元素检查
-console.log('Elements loaded:', {
-    messageInput: !!messageInput,
-    sendButton: !!sendButton,
-    micButton: !!micButton,
-    micIcon: !!micIcon,
-    connectButton: !!connectButton,
-    settingsButton: !!settingsButton,
-    settingsPanel: !!settingsPanel,
-    apiKeyInput: !!apiKeyInput
-});
+systemInstructionInput.value = CONFIG.SYSTEM_INSTRUCTION.TEXT;
+const applyConfigButton = document.getElementById('apply-config');
+const responseTypeSelect = document.getElementById('response-type-select');
 
 // Load saved values from localStorage
 const savedApiKey = localStorage.getItem('gemini_api_key');
@@ -70,6 +59,17 @@ if (savedSystemInstruction) {
     CONFIG.SYSTEM_INSTRUCTION.TEXT = savedSystemInstruction;
 }
 
+// Handle configuration panel toggle
+configToggle.addEventListener('click', () => {
+    configContainer.classList.toggle('active');
+    configToggle.classList.toggle('active');
+});
+
+applyConfigButton.addEventListener('click', () => {
+    configContainer.classList.toggle('active');
+    configToggle.classList.toggle('active');
+});
+
 // State variables
 let isRecording = false;
 let audioStreamer = null;
@@ -91,17 +91,35 @@ const client = new MultimodalLiveClient();
  * @param {string} [type='system'] - The type of the message (system, user, ai).
  */
 function logMessage(message, type = 'system') {
-    const messagesContainer = document.getElementById('messages');
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message', type);
+    const logEntry = document.createElement('div');
+    logEntry.classList.add('log-entry', type);
 
-    const content = document.createElement('div');
-    content.classList.add('message-content');
-    content.textContent = message;
+    const timestamp = document.createElement('span');
+    timestamp.classList.add('timestamp');
+    timestamp.textContent = new Date().toLocaleTimeString();
+    logEntry.appendChild(timestamp);
 
-    messageElement.appendChild(content);
-    messagesContainer.appendChild(messageElement);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    const emoji = document.createElement('span');
+    emoji.classList.add('emoji');
+    switch (type) {
+        case 'system':
+            emoji.textContent = '⚙️';
+            break;
+        case 'user':
+            emoji.textContent = '🫵';
+            break;
+        case 'ai':
+            emoji.textContent = '🤖';
+            break;
+    }
+    logEntry.appendChild(emoji);
+
+    const messageText = document.createElement('span');
+    messageText.textContent = message;
+    logEntry.appendChild(messageText);
+
+    logsContainer.appendChild(logEntry);
+    logsContainer.scrollTop = logsContainer.scrollHeight;
 }
 
 /**
@@ -225,8 +243,7 @@ async function resumeAudioContext() {
  * @returns {Promise<void>}
  */
 async function connectToWebsocket() {
-    console.log('Attempting to connect...');
-    
+    // 如果用户没有输入 key,也允许连接(可能使用服务器端默认key)
     if (!apiKeyInput.value && !confirm('No API key provided. Try to connect using server default key?')) {
         logMessage('Please input API Key', 'system');
         return;
@@ -240,23 +257,25 @@ async function connectToWebsocket() {
     const config = {
         model: CONFIG.API.MODEL_NAME,
         generationConfig: {
-            responseModalities: ["text"]
-        }
-    };
+            responseModalities: responseTypeSelect.value,
+            speechConfig: {
+                voiceConfig: { 
+                    prebuiltVoiceConfig: { 
+                        voiceName: voiceSelect.value    // You can change voice in the config.js file
+                    }
+                }
+            },
 
-    if (systemInstructionInput.value) {
-        config.systemInstruction = {
+        },
+        systemInstruction: {
             parts: [{
-                text: systemInstructionInput.value
-            }]
-        };
-    }
+                text: systemInstructionInput.value     // You can change system instruction in the config.js file
+            }],
+        }
+    };  
 
     try {
-        console.log('Connecting with config:', config);
-        await client.connect(config, apiKeyInput.value);
-        console.log('Connected successfully');
-        
+        await client.connect(config,apiKeyInput.value);
         isConnected = true;
         await resumeAudioContext();
         connectButton.textContent = 'Disconnect';
@@ -268,7 +287,6 @@ async function connectToWebsocket() {
         screenButton.disabled = false;
         logMessage('Connected to Gemini 2.0 Flash Multimodal Live API', 'system');
     } catch (error) {
-        console.error('Connection error:', error);
         const errorMessage = error.message || 'Unknown error';
         Logger.error('Connection error:', error);
         logMessage(`Connection error: ${errorMessage}`, 'system');
@@ -325,7 +343,6 @@ function handleSendMessage() {
         logMessage(message, 'user');
         client.send({ text: message });
         messageInput.value = '';
-        sendButton.classList.add('hidden');
     }
 }
 
@@ -403,17 +420,14 @@ client.on('message', (message) => {
 
 sendButton.addEventListener('click', handleSendMessage);
 messageInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
+    if (event.key === 'Enter') {
         handleSendMessage();
     }
 });
 
 micButton.addEventListener('click', handleMicToggle);
 
-connectButton.addEventListener('click', (e) => {
-    console.log('Connect button clicked');
-    e.preventDefault();
+connectButton.addEventListener('click', () => {
     if (isConnected) {
         disconnectFromWebsocket();
     } else {
@@ -542,35 +556,4 @@ function stopScreenSharing() {
 
 screenButton.addEventListener('click', handleScreenShare);
 screenButton.disabled = true;
-
-// 设置面板显示/隐藏
-settingsButton.addEventListener('click', (e) => {
-    console.log('Settings button clicked');
-    e.preventDefault();
-    settingsPanel.classList.toggle('visible');
-});
-
-// 点击设置面板外部时关闭
-document.addEventListener('click', (e) => {
-    if (settingsPanel.classList.contains('visible') && 
-        !settingsPanel.contains(e.target) && 
-        !settingsButton.contains(e.target)) {
-        settingsPanel.classList.remove('visible');
-    }
-});
-
-// 输入框内容变化时显示/隐藏发送按钮
-messageInput.addEventListener('input', () => {
-    sendButton.classList.toggle('hidden', !messageInput.value.trim());
-});
-
-window.addEventListener('error', (event) => {
-    console.error('Global error:', event.error);
-    logMessage(`Error: ${event.error.message}`, 'system');
-});
-
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled promise rejection:', event.reason);
-    logMessage(`Error: ${event.reason.message}`, 'system');
-});
   
