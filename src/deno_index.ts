@@ -19,18 +19,32 @@ async function handleWebSocket(req: Request, defaultApiKey?: string): Promise<Re
   const url = new URL(req.url);
   const apiKey = url.searchParams.get("key") || defaultApiKey;
   
+  console.log('WebSocket connection attempt:', {
+    timestamp: new Date().toISOString(),
+    hasApiKey: !!apiKey,
+    keySource: url.searchParams.get("key") ? 'client' : 'environment',
+    keyLength: apiKey?.length,
+    urlPath: url.pathname
+  });
+
   if (!apiKey) {
     ws.close(1008, "No API key provided");
     return response;
   }
 
-  const targetUrl = `wss://generativelanguage.googleapis.com${url.pathname}${url.search}`;
+  // 构建新的 URL，确保包含 API Key
+  const targetUrl = new URL(`wss://generativelanguage.googleapis.com${url.pathname}`);
+  targetUrl.searchParams.set("key", apiKey);
   
-  console.log('Target URL:', targetUrl);
+  console.log('API Key status:', {
+    hasClientKey: !!url.searchParams.get("key"),
+    hasDefaultKey: !!defaultApiKey,
+    finalKeyLength: apiKey?.length
+  });
+
+  const targetWs = new WebSocket(targetUrl.toString());
   
   const pendingMessages: string[] = [];
-  const targetWs = new WebSocket(targetUrl);
-  
   targetWs.onopen = () => {
     console.log('Connected to Gemini');
     pendingMessages.forEach(msg => targetWs.send(msg));
@@ -69,6 +83,9 @@ async function handleWebSocket(req: Request, defaultApiKey?: string): Promise<Re
 
   targetWs.onerror = (error) => {
     console.error('Gemini WebSocket error:', error);
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.close(1006, `Connection failed: ${error.message || 'Unknown error'}`);
+    }
   };
 
   return response;
