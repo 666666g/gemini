@@ -37,40 +37,32 @@ body {
 #logs-container {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 15px;
     background-color: #fff;
-    margin-bottom: 120px; /* 为音频可视化器和输入框留出空间 */
 }
 
 .input-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: #fff;
+    padding: 15px;
     border-top: 1px solid #eee;
+    background-color: #fff;
     display: flex;
+    gap: 10px;
     align-items: center;
-    gap: 8px;
+    position: relative;
 }
 
 #message-input {
     flex: 1;
-    padding: 12px 20px;
-    border: 1px solid #eee;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
     border-radius: 20px;
-    font-size: 16px;
+    font-size: 14px;
     background-color: #f8f9fa;
 }
 
-#message-input::placeholder {
-    color: #666;
-}
-
-.tool-buttons {
+.action-buttons {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 #mic-button,
@@ -92,76 +84,72 @@ body {
     font-size: 20px;
 }
 
-/* 隐藏配置面板按钮 */
-#config-toggle {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-}
-
-/* 移动端适配 */
-@media (max-width: 768px) {
-    #app {
-        padding: 0;
-    }
-    
-    .settings {
-        padding: 8px;
-    }
-    
-    #message-input {
-        margin: 0;
-    }
-    
-    .input-container {
-        padding: 8px;
-    }
-    
-    .audio-visualizers {
-        padding: 5px 10px;
-        bottom: 56px;
-    }
-    
-    .visualizer-container label {
-        font-size: 11px;
-        min-width: 70px;
-    }
-}
-
-/* 隐藏默认的发送按钮 */
+/* 隐藏发送按钮，使用输入框的右侧图标代替 */
 #send-button {
     display: none;
 }
 
-#app {
-    background-color: #fff;
-    border-radius: 8px;
+/* 配置面板样式 */
+#config-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: white;
+    border-left: 1px solid #eee;
+    height: 100%;
+    width: 300px;
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    max-width: 1000px;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    display: none;
 }
 
-#logs-container {
-    border: 1px solid #ccc;
-    height: 300px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    padding: 10px;
+#config-container.show {
+    display: block;
+}
+
+#config-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    #config-container {
+        width: 100%;
+        border-left: none;
+    }
+    
+    .input-container {
+        padding: 10px;
+    }
+}
+
+.settings {
+    padding: 10px 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+#api-key {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-    scroll-behavior: smooth;
+    font-size: 14px;
 }
 
-#logs-container:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+#connect-button {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 .log-entry {
@@ -188,33 +176,6 @@ body {
 
 .log-entry .emoji {
     margin-right: 5px;
-}
-
-#send-button, #mic-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#send-button:active, #mic-button:active {
-    transform: translateY(1px);
-}
-
-#send-button::after, #mic-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s ease, height 0.3s ease;
-}
-
-#send-button:active::after, #mic-button:active::after {
-    width: 200px;
-    height: 200px;
 }
 
 #audio-visualizer {
@@ -247,21 +208,6 @@ body {
 
 .audio-bar.active {
     animation: audio-pulse 0.5s infinite;
-}
-
-#connect-button {
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #34a853;
-    color: #fff;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-#connect-button.connected {
-    background-color: #ea4335;
 }
 
 #video-container {
@@ -305,50 +251,6 @@ body {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-#camera-button {
-    background: #4285f4;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 50%;
-    cursor: pointer;
-    margin-left: 8px;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-#camera-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#camera-button:active {
-    transform: translateY(1px);
-}
-
-#camera-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s ease, height 0.3s ease;
-}
-
-#camera-button:active::after {
-    width: 200px;
-    height: 200px;
-}
-
-#camera-button.active {
-    background: #ea4335;
 }
 
 #frame-preview {
@@ -400,50 +302,6 @@ body {
 
 #video-container:hover .video-controls {
     opacity: 1;
-}
-
-#screen-button {
-    background: #4285f4;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 50%;
-    cursor: pointer;
-    margin-left: 8px;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-#screen-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-#screen-button:active {
-    transform: translateY(1px);
-}
-
-#screen-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.3s ease, height 0.3s ease;
-}
-
-#screen-button:active::after {
-    width: 200px;
-    height: 200px;
-}
-
-#screen-button.active {
-    background: #ea4335;
 }
 
 /* Add styles for screen preview */
@@ -504,35 +362,29 @@ body {
 }
 
 .audio-visualizers {
-    position: fixed;
-    bottom: 60px; /* 在输入框上方 */
-    left: 0;
-    right: 0;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding: 10px;
-    background-color: #fff;
+    gap: 10px;
+    margin: 10px 0;
 }
 
 .visualizer-container {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .visualizer-container label {
-    font-size: 12px;
+    font-size: 0.8em;
     color: #666;
-    min-width: 80px;
 }
 
 #input-audio-visualizer,
 #audio-visualizer {
-    flex: 1;
-    height: 16px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
+    width: 100%;
+    height: 20px;
+    background-color: #eee;
+    border-radius: 4px;
     overflow: hidden;
 }
 
@@ -565,137 +417,6 @@ body {
     animation: audio-pulse 0.5s infinite;
 }
 
-.settings {
-    padding: 10px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background-color: #fff;
-    border-bottom: 1px solid #eee;
-}
-
-#api-key {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-#voice-select  #response-type-select{
-    padding: 4px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
- 
-/* Configuration panel */
-#config-container {
-    background: var(--surface-color);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: none;
-}
-
-#config-container.active {
-    display: block;
-}
-.config-wrapper {
-    display: grid;
-    gap: var(--spacing-md);
-    max-width: 600px;
-    margin: 0 auto;
-}
-#apply-config {
-    padding: var(--spacing-md);
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-#apply-config:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-#system-instruction {
-    padding: var(--spacing-md);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    font-size: 14px;
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-    #app {
-        padding: var(--spacing-sm);
-        width: 96%;
-    }
-
-    .hidden-mobile {
-        display: none;
-    }
-
-    #config-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 1000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        overflow-y: auto;
-        display: block;
-        background: var(--surface-color);
-        padding: var(--spacing-lg);
-    }
-
-    #config-container.active {
-        transform: translateX(0);
-    }
-
-    .logs-wrapper {
-        max-height: 30vh;
-    }
-
-    #logs-container {
-        max-height: calc(30vh - 50px);
-    }
-
-    .input-controls {
-        position: sticky;
-        bottom: 0;
-        background: var(--surface-color);
-        padding: var(--spacing-md);
-        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-        z-index: 100;
-    }
-
-    .action-buttons {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    #video-container {
-        width: 60%;
-        max-height: 40vh;
-        bottom: 0;
-        right: 0;
-    }
-
-    #screen-container {
-        width: 100%;
-        height: 50vh;
-        bottom: 0;
-        left: 0;
-        right: auto;
-    }
-}
-
 .setting-container {
     display: flex;
     align-items: center;
@@ -706,7 +427,6 @@ body {
     font-size: 12px;
     font-weight: bold;
 }
-
 
 .fps-help {
     color: #666;

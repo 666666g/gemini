@@ -16,9 +16,29 @@
 <body>
     <div id="app">
         <div class="settings">
-            <input type="password" id="api-key" placeholder="Please Input Gemini API Key" />
+            <input type="password" id="api-key" placeholder="请输入 Gemini API Key" />
+            <button id="connect-button">Connect</button>
             <button id="config-toggle" class="material-symbols-outlined">settings</button>
         </div>
+        
+        <div id="logs-container"></div>
+        
+        <div class="input-container">
+            <input type="text" id="message-input" placeholder="问一问 Gemini" />
+            <button id="send-button">Send</button>
+            <div class="action-buttons">
+                <button id="mic-button">
+                    <span class="material-symbols-outlined">mic</span>
+                </button>
+                <button id="camera-button">
+                    <span class="material-symbols-outlined">videocam</span>
+                </button>
+                <button id="screen-button">
+                    <span class="material-symbols-outlined">screen_share</span>
+                </button>
+            </div>
+        </div>
+        
         <div id="config-container" class="hidden-mobile">
             <div class="config-wrapper">
                 <div class="setting-container">
@@ -47,19 +67,6 @@
                 <button id="apply-config">Confirm</button>
             </div>
         </div>
-        <button id="connect-button">Connect</button>
-        <div id="logs-container"></div>
-        <input type="text" id="message-input" placeholder="Enter message...">
-        <button id="send-button">Send</button>
-        <button id="mic-button">
-            <span id="mic-icon" class="material-symbols-outlined">mic</span>
-        </button>
-        <button id="camera-button">
-            <span id="camera-icon" class="material-symbols-outlined">videocam</span>
-        </button>
-        <button id="screen-button">
-            <span id="screen-icon" class="material-symbols-outlined">screen_share</span>
-        </button>
         <div class="audio-visualizers">
             <div class="visualizer-container">
                 <label>Input Audio</label>
