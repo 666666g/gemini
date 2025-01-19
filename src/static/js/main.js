@@ -15,7 +15,6 @@ import { ScreenRecorder } from './video/screen-recorder.js';
 console.log('Initializing elements...');
 
 // DOM Elements
-const logsContainer = document.getElementById('logs-container');
 const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
 const micButton = document.getElementById('mic-button');
@@ -33,17 +32,12 @@ const inputAudioVisualizer = document.getElementById('input-audio-visualizer');
 const apiKeyInput = document.getElementById('api-key');
 const voiceSelect = document.getElementById('voice-select');
 const fpsInput = document.getElementById('fps-input');
-const configToggle = document.getElementById('config-toggle');
-const configContainer = document.getElementById('config-container');
 const systemInstructionInput = document.getElementById('system-instruction');
-const applyConfigButton = document.getElementById('apply-config');
-const responseTypeSelect = document.getElementById('response-type-select');
 const settingsButton = document.getElementById('settings-button');
 const settingsPanel = document.getElementById('settings-panel');
 
 // 添加元素检查
 console.log('Elements loaded:', {
-    logsContainer: !!logsContainer,
     messageInput: !!messageInput,
     sendButton: !!sendButton,
     micButton: !!micButton,
@@ -75,17 +69,6 @@ if (savedSystemInstruction) {
     systemInstructionInput.value = savedSystemInstruction;
     CONFIG.SYSTEM_INSTRUCTION.TEXT = savedSystemInstruction;
 }
-
-// Handle configuration panel toggle
-configToggle.addEventListener('click', () => {
-    configContainer.classList.toggle('active');
-    configToggle.classList.toggle('active');
-});
-
-applyConfigButton.addEventListener('click', () => {
-    configContainer.classList.toggle('active');
-    configToggle.classList.toggle('active');
-});
 
 // State variables
 let isRecording = false;
@@ -257,14 +240,17 @@ async function connectToWebsocket() {
     const config = {
         model: CONFIG.API.MODEL_NAME,
         generationConfig: {
-            responseModalities: ["text"], // 简化配置
-        },
-        systemInstruction: {
-            parts: [{
-                text: systemInstructionInput.value || CONFIG.SYSTEM_INSTRUCTION.TEXT
-            }],
+            responseModalities: ["text"]
         }
     };
+
+    if (systemInstructionInput.value) {
+        config.systemInstruction = {
+            parts: [{
+                text: systemInstructionInput.value
+            }]
+        };
+    }
 
     try {
         console.log('Connecting with config:', config);
@@ -564,8 +550,27 @@ settingsButton.addEventListener('click', (e) => {
     settingsPanel.classList.toggle('visible');
 });
 
+// 点击设置面板外部时关闭
+document.addEventListener('click', (e) => {
+    if (settingsPanel.classList.contains('visible') && 
+        !settingsPanel.contains(e.target) && 
+        !settingsButton.contains(e.target)) {
+        settingsPanel.classList.remove('visible');
+    }
+});
+
 // 输入框内容变化时显示/隐藏发送按钮
 messageInput.addEventListener('input', () => {
     sendButton.classList.toggle('hidden', !messageInput.value.trim());
+});
+
+window.addEventListener('error', (event) => {
+    console.error('Global error:', event.error);
+    logMessage(`Error: ${event.error.message}`, 'system');
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    logMessage(`Error: ${event.reason.message}`, 'system');
 });
   
