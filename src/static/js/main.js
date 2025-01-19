@@ -226,39 +226,18 @@ async function resumeAudioContext() {
  * @returns {Promise<void>}
  */
 async function connectToWebsocket() {
-    // 如果用户没有输入 key,也允许连接(可能使用服务器端默认key)
+    console.log('Attempting to connect...');
+    
     if (!apiKeyInput.value && !confirm('No API key provided. Try to connect using server default key?')) {
         logMessage('Please input API Key', 'system');
         return;
     }
 
-    // Save values to localStorage
-    localStorage.setItem('gemini_api_key', apiKeyInput.value);
-    localStorage.setItem('gemini_voice', voiceSelect.value);
-    localStorage.setItem('system_instruction', systemInstructionInput.value);
-
-    const config = {
-        model: CONFIG.API.MODEL_NAME,
-        generationConfig: {
-            responseModalities: responseTypeSelect.value,
-            speechConfig: {
-                voiceConfig: { 
-                    prebuiltVoiceConfig: { 
-                        voiceName: voiceSelect.value    // You can change voice in the config.js file
-                    }
-                }
-            },
-
-        },
-        systemInstruction: {
-            parts: [{
-                text: systemInstructionInput.value     // You can change system instruction in the config.js file
-            }],
-        }
-    };  
-
     try {
-        await client.connect(config,apiKeyInput.value);
+        console.log('Connecting with config...');
+        await client.connect(config, apiKeyInput.value);
+        console.log('Connected successfully');
+        
         isConnected = true;
         await resumeAudioContext();
         connectButton.textContent = 'Disconnect';
@@ -270,6 +249,7 @@ async function connectToWebsocket() {
         screenButton.disabled = false;
         logMessage('Connected to Gemini 2.0 Flash Multimodal Live API', 'system');
     } catch (error) {
+        console.error('Connection error:', error);
         const errorMessage = error.message || 'Unknown error';
         Logger.error('Connection error:', error);
         logMessage(`Connection error: ${errorMessage}`, 'system');
@@ -412,7 +392,9 @@ messageInput.addEventListener('keypress', (event) => {
 
 micButton.addEventListener('click', handleMicToggle);
 
-connectButton.addEventListener('click', () => {
+connectButton.addEventListener('click', (e) => {
+    console.log('Connect button clicked');
+    e.preventDefault();
     if (isConnected) {
         disconnectFromWebsocket();
     } else {
@@ -543,7 +525,9 @@ screenButton.addEventListener('click', handleScreenShare);
 screenButton.disabled = true;
 
 // 设置面板显示/隐藏
-settingsButton.addEventListener('click', () => {
+settingsButton.addEventListener('click', (e) => {
+    console.log('Settings button clicked');
+    e.preventDefault();
     settingsPanel.classList.toggle('visible');
 });
 
