@@ -11,6 +11,9 @@ import { ScreenRecorder } from './video/screen-recorder.js';
  * Initializes and manages the UI, audio, video, and WebSocket interactions.
  */
 
+// 在文件开头添加调试日志
+console.log('Initializing elements...');
+
 // DOM Elements
 const logsContainer = document.getElementById('logs-container');
 const messageInput = document.getElementById('message-input');
@@ -37,6 +40,19 @@ const applyConfigButton = document.getElementById('apply-config');
 const responseTypeSelect = document.getElementById('response-type-select');
 const settingsButton = document.getElementById('settings-button');
 const settingsPanel = document.getElementById('settings-panel');
+
+// 添加元素检查
+console.log('Elements loaded:', {
+    logsContainer: !!logsContainer,
+    messageInput: !!messageInput,
+    sendButton: !!sendButton,
+    micButton: !!micButton,
+    micIcon: !!micIcon,
+    connectButton: !!connectButton,
+    settingsButton: !!settingsButton,
+    settingsPanel: !!settingsPanel,
+    apiKeyInput: !!apiKeyInput
+});
 
 // Load saved values from localStorage
 const savedApiKey = localStorage.getItem('gemini_api_key');
@@ -233,8 +249,25 @@ async function connectToWebsocket() {
         return;
     }
 
+    // Save values to localStorage
+    localStorage.setItem('gemini_api_key', apiKeyInput.value);
+    localStorage.setItem('gemini_voice', voiceSelect.value);
+    localStorage.setItem('system_instruction', systemInstructionInput.value);
+
+    const config = {
+        model: CONFIG.API.MODEL_NAME,
+        generationConfig: {
+            responseModalities: ["text"], // 简化配置
+        },
+        systemInstruction: {
+            parts: [{
+                text: systemInstructionInput.value || CONFIG.SYSTEM_INSTRUCTION.TEXT
+            }],
+        }
+    };
+
     try {
-        console.log('Connecting with config...');
+        console.log('Connecting with config:', config);
         await client.connect(config, apiKeyInput.value);
         console.log('Connected successfully');
         
