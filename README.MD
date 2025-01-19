@@ -21,7 +21,8 @@ B站，YouTube，抖音，公众号 全网同名。转载请注明作者。
 2. 登录/注册 https://dash.deno.com/
 3. 创建项目 https://dash.deno.com/new_project
 4. 选择此项目，填写项目名字（请仔细填写项目名字，关系到自动分配的域名）
-5. Entrypoint 填写 `src/deno_index.ts` 其他字段留空 
+5. 在项目设置中添加环境变量 GEMINI_API_KEY={你的API Key}
+6. Entrypoint 填写 `src/deno_index.ts` 其他字段留空 
    <details>
    <summary>如图</summary>
    

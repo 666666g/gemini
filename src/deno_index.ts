@@ -13,10 +13,17 @@ const getContentType = (path: string): string => {
   return types[ext] || 'text/plain';
 };
 
-async function handleWebSocket(req: Request): Promise<Response> {
-  const { socket: clientWs, response } = Deno.upgradeWebSocket(req);
+async function handleWebSocket(req: Request, defaultApiKey?: string): Promise<Response> {
+  const { socket: ws, response } = Deno.upgradeWebSocket(req);
   
   const url = new URL(req.url);
+  const apiKey = url.searchParams.get("key") || defaultApiKey;
+  
+  if (!apiKey) {
+    ws.close(1008, "No API key provided");
+    return response;
+  }
+
   const targetUrl = `wss://generativelanguage.googleapis.com${url.pathname}${url.search}`;
   
   console.log('Target URL:', targetUrl);
@@ -30,7 +37,7 @@ async function handleWebSocket(req: Request): Promise<Response> {
     pendingMessages.length = 0;
   };
 
-  clientWs.onmessage = (event) => {
+  ws.onmessage = (event) => {
     console.log('Client message received');
     if (targetWs.readyState === WebSocket.OPEN) {
       targetWs.send(event.data);
@@ -41,12 +48,12 @@ async function handleWebSocket(req: Request): Promise<Response> {
 
   targetWs.onmessage = (event) => {
     console.log('Gemini message received');
-    if (clientWs.readyState === WebSocket.OPEN) {
-      clientWs.send(event.data);
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(event.data);
     }
   };
 
-  clientWs.onclose = (event) => {
+  ws.onclose = (event) => {
     console.log('Client connection closed');
     if (targetWs.readyState === WebSocket.OPEN) {
       targetWs.close(1000, event.reason);
@@ -55,8 +62,8 @@ async function handleWebSocket(req: Request): Promise<Response> {
 
   targetWs.onclose = (event) => {
     console.log('Gemini connection closed');
-    if (clientWs.readyState === WebSocket.OPEN) {
-      clientWs.close(event.code, event.reason);
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.close(event.code, event.reason);
     }
   };
 
@@ -88,9 +95,12 @@ async function handleRequest(req: Request): Promise<Response> {
   const url = new URL(req.url);
   console.log('Request URL:', req.url);
 
+  // 获取环境变量中的 API Key
+  const defaultApiKey = Deno.env.get("GEMINI_API_KEY");
+
   // WebSocket 处理
   if (req.headers.get("Upgrade")?.toLowerCase() === "websocket") {
-    return handleWebSocket(req);
+    return handleWebSocket(req, defaultApiKey);
   }
 
   if (url.pathname.endsWith("/chat/completions") ||

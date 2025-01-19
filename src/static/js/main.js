@@ -243,7 +243,8 @@ async function resumeAudioContext() {
  * @returns {Promise<void>}
  */
 async function connectToWebsocket() {
-    if (!apiKeyInput.value) {
+    // 如果用户没有输入 key,也允许连接(可能使用服务器端默认key)
+    if (!apiKeyInput.value && !confirm('No API key provided. Try to connect using server default key?')) {
         logMessage('Please input API Key', 'system');
         return;
     }
