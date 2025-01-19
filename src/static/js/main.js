@@ -92,35 +92,17 @@ const client = new MultimodalLiveClient();
  * @param {string} [type='system'] - The type of the message (system, user, ai).
  */
 function logMessage(message, type = 'system') {
-    const logEntry = document.createElement('div');
-    logEntry.classList.add('log-entry', type);
+    const messagesContainer = document.getElementById('messages');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', type);
 
-    const timestamp = document.createElement('span');
-    timestamp.classList.add('timestamp');
-    timestamp.textContent = new Date().toLocaleTimeString();
-    logEntry.appendChild(timestamp);
+    const content = document.createElement('div');
+    content.classList.add('message-content');
+    content.textContent = message;
 
-    const emoji = document.createElement('span');
-    emoji.classList.add('emoji');
-    switch (type) {
-        case 'system':
-            emoji.textContent = '⚙️';
-            break;
-        case 'user':
-            emoji.textContent = '🫵';
-            break;
-        case 'ai':
-            emoji.textContent = '🤖';
-            break;
-    }
-    logEntry.appendChild(emoji);
-
-    const messageText = document.createElement('span');
-    messageText.textContent = message;
-    logEntry.appendChild(messageText);
-
-    logsContainer.appendChild(logEntry);
-    logsContainer.scrollTop = logsContainer.scrollHeight;
+    messageElement.appendChild(content);
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 /**
@@ -344,6 +326,7 @@ function handleSendMessage() {
         logMessage(message, 'user');
         client.send({ text: message });
         messageInput.value = '';
+        sendButton.classList.add('hidden');
     }
 }
 
@@ -421,7 +404,8 @@ client.on('message', (message) => {
 
 sendButton.addEventListener('click', handleSendMessage);
 messageInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
         handleSendMessage();
     }
 });
@@ -566,23 +550,5 @@ settingsButton.addEventListener('click', () => {
 // 输入框内容变化时显示/隐藏发送按钮
 messageInput.addEventListener('input', () => {
     sendButton.classList.toggle('hidden', !messageInput.value.trim());
-});
-
-// 发送消息
-sendButton.addEventListener('click', () => {
-    const message = messageInput.value.trim();
-    if (message) {
-        sendMessage(message);
-        messageInput.value = '';
-        sendButton.classList.add('hidden');
-    }
-});
-
-// Enter键发送消息
-messageInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendButton.click();
-    }
 });
   

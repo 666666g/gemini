@@ -46,6 +46,10 @@ header {
     cursor: pointer;
 }
 
+#connect-button.connected {
+    background-color: var(--danger-color);
+}
+
 #settings-button {
     background: none;
     border: none;
@@ -85,6 +89,8 @@ header {
 #messages {
     max-width: 800px;
     margin: 0 auto;
+    padding: 1rem;
+    min-height: 200px;
 }
 
 footer {
@@ -122,6 +128,12 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--primary-color);
+}
+
+.action-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .action-buttons button:hover {
@@ -649,4 +661,32 @@ footer {
 .fps-help {
     color: #666;
     font-size: 12px;
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    max-width: 80%;
+}
+
+.message.system {
+    background-color: #f1f3f4;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.message.user {
+    background-color: var(--primary-color);
+    color: white;
+    margin-left: auto;
+}
+
+.message.ai {
+    background-color: #f1f3f4;
+    margin-right: auto;
+}
+
+.message-content {
+    word-break: break-word;
 }
