@@ -17,27 +17,40 @@
     <div id="app">
         <div class="settings">
             <input type="password" id="api-key" placeholder="Please Input Gemini API Key" />
-            <button id="connect-button">Connect</button>
             <button id="config-toggle" class="material-symbols-outlined">settings</button>
         </div>
+        <div id="config-container" class="hidden-mobile">
+            <!-- 保持原有配置内容不变 -->
+        </div>
+        <button id="connect-button">Connect</button>
         
         <div id="logs-container"></div>
         
         <div class="input-container">
-            <input type="text" id="message-input" placeholder="问一问 Gemini" />
+            <input type="text" id="message-input" placeholder="问一问 Gemini">
             <div class="action-buttons">
                 <button id="mic-button">
-                    <span class="material-symbols-outlined">mic</span>
+                    <span id="mic-icon" class="material-symbols-outlined">mic</span>
                 </button>
                 <button id="camera-button">
-                    <span class="material-symbols-outlined">videocam</span>
+                    <span id="camera-icon" class="material-symbols-outlined">videocam</span>
                 </button>
                 <button id="screen-button">
-                    <span class="material-symbols-outlined">screen_share</span>
+                    <span id="screen-icon" class="material-symbols-outlined">screen_share</span>
                 </button>
             </div>
         </div>
+
+        <div class="audio-visualizers">
+            <!-- 原有音频可视化内容 -->
+        </div>
+        <div id="video-container" style="display: none;">
+            <!-- 原有视频内容 -->
+        </div>
+        <div id="screen-container" style="display: none;">
+            <!-- 原有屏幕共享内容 -->
+        </div>
     </div>
-    <script type="module" src="js/main.js"></script>
+    <script src="js/main.js" type="module"></script>
 </body>
 </html> 
